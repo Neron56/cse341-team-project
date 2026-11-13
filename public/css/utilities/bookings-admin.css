@@ -1,0 +1,38 @@
+.bookings-admin {
+    padding-block: var(--space-lg);
+
+    #bookings-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+        gap: var(--space-lg);
+        margin-block: var(--space-lg);
+    }
+
+    .booking-admin-card {
+        border: 1px solid #b7c4e8;
+        border-radius: var(--radius-lg);
+        padding: var(--space-lg);
+        background: #f8faff;
+        overflow-wrap: anywhere;
+    }
+
+    dl > div {
+        margin-block: var(--space-sm);
+    }
+
+    dt {
+        font-weight: bold;
+    }
+
+    dd {
+        margin: 0;
+    }
+
+    ul {
+        padding-inline-start: var(--space-lg);
+    }
+
+    #bookings-error {
+        color: #8f1f1f;
+    }
+}

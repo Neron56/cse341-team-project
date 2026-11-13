@@ -1,0 +1,29 @@
+<%- include('./partials/header') %>
+
+<section class="bookings-admin">
+    <h1>Bookings Admin</h1>
+    <p>Review bookings and passenger details.</p>
+    <p id="bookings-loading" role="status">Loading bookings...</p>
+    <p id="bookings-error" role="alert" hidden></p>
+    <p id="bookings-empty" hidden>No bookings yet.</p>
+    <div id="bookings-list" aria-live="polite"></div>
+
+    <template id="booking-card-template">
+        <article class="booking-admin-card">
+            <h2><a data-field="reference"></a></h2>
+            <dl>
+                <div><dt>Trip</dt><dd data-field="trip"></dd></div>
+                <div><dt>Schedule</dt><dd data-field="schedule"></dd></div>
+                <div><dt>Ticket class</dt><dd data-field="ticket"></dd></div>
+                <div><dt>Travel day</dt><dd data-field="day"></dd></div>
+                <div><dt>Booked on</dt><dd data-field="created"></dd></div>
+            </dl>
+            <h3>Passengers</h3>
+            <ul data-field="passengers"></ul>
+        </article>
+    </template>
+    <noscript>Enable JavaScript to load bookings.</noscript>
+</section>
+<script src="/js/bookings.js" defer></script>
+
+<%- include('./partials/footer') %>
