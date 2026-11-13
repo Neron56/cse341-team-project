@@ -60,7 +60,7 @@ This repository is set up as a **GitHub template**. Use the template feature to 
    ```
 5. Install dependencies: `npm install`
 6. Copy `.env.example` to `.env` and set `MONGODB_URI` (and optionally `MONGODB_DB_NAME`) for your MongoDB instance.
-7. Import the starter data with `npm run db:import`. This replaces the starter collections and clears any confirmations in that database.
+7. Import the starter data with `npm run db:import`. This replaces the starter collections and clears any bookings in that database. For an existing database with booking data, use the migration instructions below instead.
 8. Run the automated tests with `npm test`. Tests use a temporary local database and do not change the database in your `.env` file.
 9. Start the development server: `npm run dev`
 
@@ -73,6 +73,33 @@ The application and automated tests share the database initialization function i
 Vitest starts the temporary database once for the complete test run. Before each individual test, the setup clears that temporary database and restores the starter data. This means each test begins with the same data, and test changes cannot reach the database configured in `.env`.
 
 See `tests/trains.test.js` for example endpoint tests that use Supertest to send requests to the real `/api/trains` route.
+
+### W03 Bookings
+
+The feature spec and issue body are in [docs/w03-bookings-spec.md](docs/w03-bookings-spec.md).
+Booking documents now use the `bookings` collection and a Mongoose schema.
+The existing booking form and `/trips/confirmation/:bookingId` URLs are retained.
+Visit `/bookings-admin` to load bookings through `GET /api/bookings`, which returns
+`{ "bookings": [...] }`. Swagger annotations are in `src/routes/api-routes.js`.
+The assignment's admin page and API have no authentication; use fictional
+passenger details for demonstrations.
+
+For an existing database, stop the app and run `npm run db:migrate-bookings`
+before starting the updated app. This renames `confirmations` to `bookings`,
+preserves the documents, and ensures the unique booking-reference index exists.
+If there is no legacy collection, the command ensures that index on `bookings`.
+If both collections exist, it stops without overwriting either collection;
+resolve the two datasets before rerunning. Do not run `db:import` to migrate
+existing bookings: that command intentionally resets data.
+
+The tests cover booking persistence, form submissions, validation, API errors,
+legacy migration, and admin-page DOM rendering (including empty/error states
+and safe rendering of HTML-like passenger names). All database tests use the
+temporary test database rather than `.env` credentials.
+
+See [docs/w03-bookings-pr.md](docs/w03-bookings-pr.md) for the prepared PR body
+and [docs/w03-bookings-walkthrough.md](docs/w03-bookings-walkthrough.md) for
+the recording outline and remaining submission steps.
 
 This project simulates realistic work situations requiring reverse engineering, refactoring, debugging, or feature extension.
 
@@ -91,7 +118,7 @@ Forking maintains the connection to the original repository and allows you to co
 - **Backend**: Node.js with Express framework
 - **Templating**: EJS
 - **Styling**: Modern nested CSS with custom properties
-- **Database**: MongoDB, using the official MongoDB Node.js driver
+- **Database**: MongoDB through a shared Mongoose connection; bookings use Mongoose models, while existing features retain native database access during the team refactor
 - **Testing**: Vitest, Supertest, and MongoDB Memory Server
 
 ## Skills You'll Develop

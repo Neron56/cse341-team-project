@@ -1,12 +1,4 @@
 /**
- * Generates a unique Japan Rail like confirmation code for bookings.
- * @returns {string} A unique confirmation code.
- */
-const generateConfirmationCode = () => {
-    return 'JR' + Math.random().toString(36).substring(2, 10).toUpperCase();
-};
-
-/**
  * Converts kilometers to miles.
  * @param {number} km - The distance in kilometers.
  * @returns {number} The equivalent distance in miles.
@@ -26,4 +18,4 @@ const yenToUsd = (yen) => {
     return yen * exchangeRate;
 };
 
-export { generateConfirmationCode, kmToMiles, yenToUsd };
+export { kmToMiles, yenToUsd };
