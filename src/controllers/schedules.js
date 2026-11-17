@@ -4,8 +4,7 @@ import { findSchedulesByTripId } from "../models/schedules.js";
 export async function getSchedulesByTripId(req, res) {
   try {
     const { tripId } = req.params;
-    const { month } = req.query;
-    const schedule = await findSchedulesByTripId(tripId, month);
+    const schedule = await findSchedulesByTripId(tripId);
     
     if (!schedule || schedule.length === 0) {
       return res.status(404).json({
@@ -26,11 +25,13 @@ export async function getSchedulesByTripId(req, res) {
 export async function getSchedulesByTripAndMonth(req, res) {
   try {
     const { tripId } = req.params;
-    const { month } = req.query;
-
-    const schedule = await findSchedulesByTripAndMonth(tripId, month);
-
-    if (!schedule) {
+    const month = Number(req.query.month);
+    if (!Number.isInteger(month) || month < 1 || month > 12) {
+    return res.status(400).json({ error: 'month must be a number from 1 to 12' });
+    }
+    const schedule = await findSchedulesByTripId(tripId, month);
+    
+    if (!schedule || schedule.length === 0) {
       return res.status(404).json({
         error: "schedule not found",
       });

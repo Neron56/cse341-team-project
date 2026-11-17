@@ -35,7 +35,7 @@ const router = Router();
  *         description: Unable to retrieve schedule
  */
 router.get('/trips/:tripId/schedules', (req, res) =>
-  getSchedulesByTripId(req, res)
+  req.query.month ? getSchedulesByTripAndMonth(req, res) : getSchedulesByTripId(req, res)
 );
 
 export default router;
