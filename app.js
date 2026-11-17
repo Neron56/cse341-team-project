@@ -4,11 +4,16 @@ import { fileURLToPath } from 'url';
 import pkg from './package.json' with { type: 'json' };
 import globalMiddleware from './src/middleware/global.js';
 import routes from './src/routes/router.js';
+import swaggerUi from 'swagger-ui-express';
+import swaggerDocument from './swagger.json' with { type: 'json' };
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = Path.dirname(__filename);
 
 const app = express();
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Add version info to res.locals for access in templates.
 app.use((req, res, next) => {
@@ -37,6 +42,7 @@ app.use((req, res, next) => {
 
 // Render the appropriate error page.
 app.use((err, req, res, next) => {
+    console.log(req.method, req.originalUrl)
     const status = err.status || 500;
     const template = status === 404 ? '404' : '500';
     const context = {

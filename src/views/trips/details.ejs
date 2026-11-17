@@ -68,35 +68,92 @@
             </div>
         </div>
 
-        <% if (details.schedules && details.schedules.length > 0) { %>
         <div class="route-schedules">
             <h2>Available Schedules</h2>
-            <div class="schedules-grid">
-                <% details.schedules.forEach(function(schedule) { %>
-                <div class="schedule-card">
-                    <div class="schedule-times">
-                        <div class="time-block">
-                            <span class="time-label">Departs</span>
-                            <span class="time-value"><%= schedule.departureTime %></span>
-                        </div>
-                        <span class="time-arrow">→</span>
-                        <div class="time-block">
-                            <span class="time-label">Arrives</span>
-                            <span class="time-value"><%= schedule.arrivalTime %></span>
-                        </div>
-                    </div>
-                    <div class="schedule-days">
-                        <% schedule.daysOfWeek.forEach(function(day) { %>
-                        <span class="day-badge"><%= day.substring(0, 3) %></span>
-                        <% }); %>
-                    </div>
-                    <a href="/trips/booking/<%= schedule.id %>" class="book-btn">Book Now</a>
-                </div>
-                <% }); %>
-            </div>
+
+            <label for="month-select">Month</label>
+            <select id="month-select">
+                <option value="">All months</option>
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+            </select>
+
+            <div id="schedules-message"></div>
+            <div id="schedules-grid" class="schedules-grid"></div>
         </div>
-        <% } %>
     </div>
 </article>
+<script>
+    const tripId = '<%= details.id %>';
+    const monthSelect = document.getElementById('month-select');
+    const grid = document.getElementById('schedules-grid');
+    const message = document.getElementById('schedules-message');
 
+    function renderSchedule(schedule) {
+        const days = schedule.daysOfWeek
+            .map(day => `<span class="day-badge">${day.substring(0, 3)}</span>`)
+            .join('');
+
+        return `
+            <div class="schedule-card">
+                <div class="schedule-times">
+                    <div class="time-block">
+                        <span class="time-label">Departs</span>
+                        <span class="time-value">${schedule.departureTime}</span>
+                    </div>
+                    <span class="time-arrow">→</span>
+                    <div class="time-block">
+                        <span class="time-label">Arrives</span>
+                        <span class="time-value">${schedule.arrivalTime}</span>
+                    </div>
+                </div>
+                <div class="schedule-days">${days}</div>
+                <a href="/trips/booking/${schedule.id}" class="book-btn">Book Now</a>
+            </div>`;
+    }
+
+    async function loadSchedules() {
+        const month = monthSelect.value;
+        const query = month ? `?month=${month}` : '';
+
+        grid.innerHTML = '';
+        message.textContent = 'Loading schedules...';
+
+        try {
+            const response = await fetch(`/api/trips/${tripId}/schedules${query}`);
+
+            if (response.status === 404) {
+                message.textContent = month
+                    ? 'No schedules available for this month.'
+                    : 'No schedules available for this trip.';
+                return;
+            }
+
+            if (!response.ok) {
+                message.textContent = 'Unable to load schedules. Please try again.';
+                return;
+            }
+
+            const schedules = await response.json();
+            message.textContent = '';
+            grid.innerHTML = schedules.map(renderSchedule).join('');
+        } catch (error) {
+            console.error(error);
+            message.textContent = 'Unable to load schedules. Please try again.';
+        }
+    }
+
+    monthSelect.addEventListener('change', loadSchedules);
+    loadSchedules();
+</script>
 <%- include('../partials/footer') %>
