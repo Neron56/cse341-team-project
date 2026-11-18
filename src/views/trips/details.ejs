@@ -99,27 +99,42 @@
     const grid = document.getElementById('schedules-grid');
     const message = document.getElementById('schedules-message');
 
-    function renderSchedule(schedule) {
-        const days = schedule.daysOfWeek
-            .map(day => `<span class="day-badge">${day.substring(0, 3)}</span>`)
-            .join('');
+    function createElement(tag, className, text) {
+    const element = document.createElement(tag);
+    if (className) element.className = className;
+    if (text !== undefined) element.textContent = text;
+    return element;
+}
 
-        return `
-            <div class="schedule-card">
-                <div class="schedule-times">
-                    <div class="time-block">
-                        <span class="time-label">Departs</span>
-                        <span class="time-value">${schedule.departureTime}</span>
-                    </div>
-                    <span class="time-arrow">→</span>
-                    <div class="time-block">
-                        <span class="time-label">Arrives</span>
-                        <span class="time-value">${schedule.arrivalTime}</span>
-                    </div>
-                </div>
-                <div class="schedule-days">${days}</div>
-                <a href="/trips/booking/${schedule.id}" class="book-btn">Book Now</a>
-            </div>`;
+    function createTimeBlock(label, value) {
+        const block = createElement('div', 'time-block');
+        block.append(
+            createElement('span', 'time-label', label),
+            createElement('span', 'time-value', value)
+        );
+        return block;
+    }
+
+    function renderSchedule(schedule) {
+        const card = createElement('div', 'schedule-card');
+
+        const times = createElement('div', 'schedule-times');
+        times.append(
+            createTimeBlock('Departs', schedule.departureTime),
+            createElement('span', 'time-arrow', '→'),
+            createTimeBlock('Arrives', schedule.arrivalTime)
+        );
+
+        const days = createElement('div', 'schedule-days');
+        schedule.daysOfWeek.forEach(day => {
+            days.append(createElement('span', 'day-badge', day.substring(0, 3)));
+        });
+
+        const bookLink = createElement('a', 'book-btn', 'Book Now');
+        bookLink.href = `/trips/booking/${encodeURIComponent(schedule.id)}`;
+
+        card.append(times, days, bookLink);
+        return card;
     }
 
     async function loadSchedules() {
@@ -146,7 +161,7 @@
 
             const schedules = await response.json();
             message.textContent = '';
-            grid.innerHTML = schedules.map(renderSchedule).join('');
+            grid.replaceChildren(...schedules.map(renderSchedule));
         } catch (error) {
             console.error(error);
             message.textContent = 'Unable to load schedules. Please try again.';

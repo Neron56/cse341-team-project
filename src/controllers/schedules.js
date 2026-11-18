@@ -7,9 +7,7 @@ export async function getSchedulesByTripId(req, res) {
     const schedule = await findSchedulesByTripId(tripId);
     
     if (!schedule || schedule.length === 0) {
-      return res.status(404).json({
-        error: "schedule not found",
-      });
+      schedule = [];
     }
 
     return res.status(200).json(schedule);
@@ -29,12 +27,10 @@ export async function getSchedulesByTripAndMonth(req, res) {
     if (!Number.isInteger(month) || month < 1 || month > 12) {
     return res.status(400).json({ error: 'month must be a number from 1 to 12' });
     }
-    const schedule = await findSchedulesByTripId(tripId, month);
+    let schedule = await findSchedulesByTripId(tripId, month);
     
     if (!schedule || schedule.length === 0) {
-      return res.status(404).json({
-        error: "schedule not found",
-      });
+      schedule = [];
     }
 
     return res.status(200).json(schedule);

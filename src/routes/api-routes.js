@@ -28,11 +28,11 @@ const router = Router();
  *           maximum: 12
  *     responses:
  *       200:
- *         description: schedule returned successfully
+ *         description: schedules returned successfully
  *       404:
- *         description: Schedule not found
+ *         description: Schedules not found
  *       500:
- *         description: Unable to retrieve schedule
+ *         description: Unable to retrieve schedules
  */
 router.get('/trips/:tripId/schedules', (req, res) =>
   req.query.month ? getSchedulesByTripAndMonth(req, res) : getSchedulesByTripId(req, res)
