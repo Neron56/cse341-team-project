@@ -14,7 +14,7 @@ The official Week 04 assignment lists Feature Set 1, Core Authentication, and ma
 
 **3. GitHub Issue links:** [Proposed Core Authentication Issue #1](https://github.com/kennethduron/cse341-kizuna-rail-w04/issues/1).
 
-**4. Pull Request links:** [Draft PR #6](https://github.com/Neron56/cse341-team-project/pull/6). It targets upstream `main`, is not merged, and is not team-approved.
+**4. Pull Request links:** [Draft PR #6](https://github.com/Neron56/cse341-team-project/pull/6). It targets upstream `main`, is not merged or team-approved; GitHub currently reports `mergeable: true` and `mergeable_state: blocked` while it remains a draft.
 
 ## Implementation Reflection
 
