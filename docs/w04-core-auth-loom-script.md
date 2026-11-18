@@ -1,6 +1,8 @@
 # Week 04 Core Authentication Walk-through
 
-**Recording status:** not recorded. This 3–4 minute script is for a local run using `npm run demo:auth`. It is not evidence that a video exists.
+**Published recording:** [Loom — narrated explanation](https://www.loom.com/share/9fbbe83b25504c30b0351efc933f5509).
+
+**Recording note:** The published video is narration-only because technical difficulties prevented screen capture. It does not show the running application, browser, or code; no visual demonstration is claimed. The prepared narration and optional screen sequence below are planning notes, not a transcript or evidence of what appears in the published video.
 
 ## English script (approximately 3–4 minutes)
 
@@ -22,7 +24,9 @@ The main technical decision was to use Mongo-backed sessions instead of JWTs. Th
 
 `npm run lint` passed. `npm test -- --reporter=verbose` passed with two test files and seven tests, including the existing trains API regression. The import script was also run against an isolated in-memory database to confirm both standard roles. The GitHub Issue is [Issue 1](https://github.com/kennethduron/cse341-kizuna-rail-w04/issues/1), and the proposed contribution is [Draft PR 6](https://github.com/Neron56/cse341-team-project/pull/6). GitHub currently reports it mergeable against `main`, but it is still a draft, unreviewed, and not team-approved. The shared integration files still need review alongside the open W03 PRs. Thank you.”
 
-## Exact screen and file sequence
+## Optional visual sequence for a separate recording
+
+This sequence is not shown in the published Loom video.
 
 | Time | Show |
 |---|---|
