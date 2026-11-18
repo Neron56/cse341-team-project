@@ -97,6 +97,37 @@ Sign out and back in after changing the role because the role is copied into the
 
 The first test run may take longer because MongoDB Memory Server needs to download a MongoDB program. Later test runs reuse that download. Use `npm run test:watch` if you want Vitest to rerun related tests while you work.
 
+### Week 04: Protected User Administration
+
+Feature Set 3 depends on the core-authentication work in PR #6. This branch is
+based on that PR's current commit; its draft PR targets `deps/w04-core-auth-pr6`
+so the review only contains user-administration changes. Do not merge the
+dependency branch into `main`. Once the team accepts core authentication,
+reconcile its final changes and retarget the feature PR to `main`.
+
+After login, open `/admin/users` using **My account** in the navigation.
+Admins see all profiles and have a **Manage users** link on `/admin`.
+Customers see only their own profile. The page loads its list from
+`GET /api/users`; saves use `PATCH /api/users/:id`, and deletion uses
+`DELETE /api/users/:id`. Both mutations require the session-bound token
+returned by the list endpoint in `X-CSRF-Token`.
+
+Editable profile fields are display name, username, and email. Passwords,
+roles, IDs, and timestamps cannot be changed through these endpoints. Every
+request refreshes the account and role from MongoDB, so deletion and role
+changes affect existing sessions. Self-deletion signs the caller out.
+
+For a disposable local demonstration, run `npm run demo:auth`. Its temporary
+database contains an admin whose random credential is printed in the terminal;
+keep that terminal off-screen while recording. Register fictional customers
+through `/register` to demonstrate owner/admin permissions. Stopping the demo
+discards the test data. No shared database setup or import is needed for it.
+
+The [feature spec](docs/w04-user-admin-spec.md) documents permissions, errors,
+and the test plan. OpenAPI annotations for the new routes are in
+`src/routes/users.js`; include that file in the team's Swagger generator when
+integrating the W03 API documentation work.
+
 ### Automated Test Setup
 
 The application and automated tests share the database initialization function in `src/db/initialize.js`. The normal `db:import` command runs it against the database configured in `.env`. Automated tests run it against a temporary MongoDB database instead.

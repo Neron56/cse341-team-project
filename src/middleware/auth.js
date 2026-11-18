@@ -1,7 +1,27 @@
-const loadSessionUser = (req, res, next) => {
-  req.user = req.session?.user || null;
-  res.locals.user = req.user;
-  next();
+import { getUserById } from '../models/users.js';
+import { destroyUserSession, sessionIdentity } from '../includes/user-session.js';
+
+const loadSessionUser = async (req, res, next) => {
+  req.user = null;
+  res.locals.user = null;
+  if (!req.session?.user) {
+    return next();
+  }
+
+  try {
+    // A session identifies the account; current DB data grants its privileges.
+    const user = await getUserById(req.session.user.id);
+    if (!user || !user.role) {
+      await destroyUserSession(req, res);
+      return next();
+    }
+    req.user = user;
+    req.session.user = sessionIdentity(user);
+    res.locals.user = user;
+    return next();
+  } catch (error) {
+    return next(error);
+  }
 };
 
 const requireApiLogin = (req, res, next) => {

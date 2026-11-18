@@ -1,0 +1,48 @@
+.user-admin {
+    padding-block: var(--space-lg);
+
+    #users-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 23rem), 1fr));
+        gap: var(--space-lg);
+        margin-block: var(--space-lg);
+    }
+
+    .user-card {
+        border: 1px solid #b7c4e8;
+        border-radius: var(--radius-lg);
+        padding: var(--space-lg);
+        background: #f8faff;
+        overflow-wrap: anywhere;
+    }
+
+    form, label {
+        display: grid;
+        gap: var(--space-sm);
+    }
+
+    input {
+        width: 100%;
+        min-width: 0;
+        padding: var(--space-sm);
+    }
+
+    .user-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-sm);
+    }
+
+    button {
+        padding: var(--space-sm);
+        cursor: pointer;
+    }
+
+    button:disabled {
+        cursor: wait;
+    }
+
+    #users-error, [data-action="delete"] {
+        color: #8f1f1f;
+    }
+}
