@@ -1,6 +1,6 @@
 # W04 Feature Set 1: Core Authentication
 
-**Status:** proposed implementation; the course feature set is confirmed, but a team owner has not been confirmed. This is not a claim that the team assigned the work to Kenneth.
+**Status:** proposed implementation; the course feature set is confirmed, but a team owner has not been confirmed. This is not a claim that the team assigned the work to Kenneth. This spec was written after the initial implementation, following the requested autonomous workflow; it does not prove the course's preferred spec-before-coding sequence.
 
 ## Source and scope
 
