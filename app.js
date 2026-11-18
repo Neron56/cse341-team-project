@@ -9,6 +9,7 @@ import globalMiddleware from './src/middleware/global.js';
 import { loadSessionUser } from './src/middleware/auth.js';
 import adminRoutes from './src/routes/admin.js';
 import authRoutes from './src/routes/auth.js';
+import { userPages, userApi } from './src/routes/users.js';
 import routes from './src/routes/router.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -64,8 +65,10 @@ app.use(session({
     }
 }));
 
-app.use(loadSessionUser);
 app.use(globalMiddleware);
+app.use(loadSessionUser);
+app.use('/api/users', userApi);
+app.use('/', userPages);
 app.use('/', authRoutes);
 app.use('/', adminRoutes);
 app.use('/', routes);
@@ -80,6 +83,12 @@ app.use((req, res, next) => {
 // Render the appropriate error page.
 app.use((err, req, res, next) => {
     const status = err.status || 500;
+    if (req.path.startsWith('/api/')) {
+        res.set('Cache-Control', 'no-store');
+        return res.status(status).json({
+            error: status >= 500 ? 'Unable to complete request' : 'Invalid request'
+        });
+    }
     const template = status === 404 ? '404' : '500';
     const context = {
         title: status === 404 ? 'Page Not Found' : 'Server Error',

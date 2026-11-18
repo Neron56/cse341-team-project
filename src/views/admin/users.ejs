@@ -1,0 +1,36 @@
+<%- include('../partials/header') %>
+<section class="user-admin" id="user-admin">
+    <h1><%= title %></h1>
+    <p>Update profile information or delete an account.</p>
+    <p id="users-loading" role="status">Loading profiles...</p>
+    <p id="users-error" role="alert" hidden></p>
+    <p id="users-status" role="status"></p>
+    <p id="users-empty" hidden>No users to display.</p>
+    <button type="button" id="users-refresh">Refresh profiles</button>
+    <div id="users-list" aria-live="polite"></div>
+
+    <template id="user-card-template">
+        <article class="user-card">
+            <h2 data-field="heading"></h2>
+            <p>Role: <span data-field="role"></span></p>
+            <form>
+                <label>Display name
+                    <input name="displayName" maxlength="80" required autocomplete="name">
+                </label>
+                <label>Username
+                    <input name="username" minlength="3" maxlength="32" pattern="[a-zA-Z0-9._\-]{3,32}" required autocomplete="username">
+                </label>
+                <label>Email
+                    <input name="email" type="email" maxlength="254" required autocomplete="email">
+                </label>
+                <div class="user-actions">
+                    <button type="submit">Save changes</button>
+                    <button type="button" data-action="delete">Delete account</button>
+                </div>
+            </form>
+        </article>
+    </template>
+    <noscript>Enable JavaScript to load and manage profiles.</noscript>
+</section>
+<script src="/js/user-admin.js" defer></script>
+<%- include('../partials/footer') %>

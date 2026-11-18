@@ -42,7 +42,8 @@
                         <% if (user.role === 'admin') { %>
                             <li><a href="/admin">Admin Dashboard</a></li>
                         <% } %>
-                        <li><span>Signed in as <%= user.displayName %></span></li>
+                        <li><a href="/admin/users">My account</a></li>
+                        <li><span data-session-name>Signed in as <%= user.displayName %></span></li>
                         <li>
                             <form method="post" action="/logout">
                                 <button type="submit">Log out</button>

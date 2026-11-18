@@ -34,4 +34,52 @@ const verifyPassword = async (password, passwordHash) => {
   return Boolean(passwordHash) && matches;
 };
 
-export { createUser, findUserByEmail, verifyPassword };
+const profileFields = 'displayName username email role createdAt updatedAt';
+
+// Construct a public representation instead of serializing a whole document.
+const toPublicUser = (user) => user ? {
+  id: user._id.toString(),
+  displayName: user.displayName,
+  username: user.username,
+  email: user.email,
+  role: user.role?.name || null,
+  createdAt: user.createdAt,
+  updatedAt: user.updatedAt
+} : null;
+
+const getUserById = async (id) => {
+  if (typeof id !== 'string' || !/^[a-f\d]{24}$/i.test(id)) {
+    return null;
+  }
+  const user = await User.findById(id).select(profileFields).populate('role', 'name').lean();
+  return toPublicUser(user);
+};
+
+const getAllUsers = async () => {
+  const users = await User.find({}).select(profileFields).populate('role', 'name')
+    .sort({ username: 1, _id: 1 }).lean();
+  return users.map(toPublicUser);
+};
+
+const updateUserById = async (id, changes) => {
+  const fields = {};
+  for (const key of ['displayName', 'username', 'email']) {
+    if (Object.hasOwn(changes, key)) {
+      fields[key] = changes[key];
+    }
+  }
+  const user = await User.findByIdAndUpdate(id, { $set: fields }, {
+    returnDocument: 'after', runValidators: true
+  }).select(profileFields).populate('role', 'name').lean();
+  return toPublicUser(user);
+};
+
+const deleteUserById = async (id) => {
+  const user = await User.findByIdAndDelete(id).select('_id').lean();
+  return user ? user._id.toString() : null;
+};
+
+export {
+  createUser, findUserByEmail, verifyPassword,
+  getUserById, getAllUsers, updateUserById, deleteUserById
+};
