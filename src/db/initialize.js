@@ -3,6 +3,7 @@ import schedules from './seeds/schedules.json' with { type: 'json' };
 import stations from './seeds/stations.json' with { type: 'json' };
 import ticketClasses from './seeds/ticket-classes.json' with { type: 'json' };
 import trains from './seeds/trains.json' with { type: 'json' };
+import Role from '../models/schemas/roles.js';
 
 const starterCollections = [
   ['trips', trips],
@@ -26,6 +27,15 @@ const initializeDatabase = async (db) => {
   const confirmations = db.collection('confirmations');
   await confirmations.deleteMany({});
   await confirmations.createIndex({ id: 1 }, { unique: true });
+
+  await Promise.all([
+    db.collection('roles').createIndex({ name: 1 }, { unique: true }),
+    db.collection('users').createIndex({ username: 1 }, { unique: true }),
+    db.collection('users').createIndex({ email: 1 }, { unique: true })
+  ]);
+  await Promise.all(['customer', 'admin'].map((name) =>
+    Role.updateOne({ name }, { $setOnInsert: { name } }, { upsert: true })
+  ));
 };
 
 export { initializeDatabase, starterCollections };

@@ -60,9 +60,40 @@ This repository is set up as a **GitHub template**. Use the template feature to 
    ```
 5. Install dependencies: `npm install`
 6. Copy `.env.example` to `.env` and set `MONGODB_URI` (and optionally `MONGODB_DB_NAME`) for your MongoDB instance.
-7. Import the starter data with `npm run db:import`. This replaces the starter collections and clears any confirmations in that database.
-8. Run the automated tests with `npm test`. Tests use a temporary local database and do not change the database in your `.env` file.
-9. Start the development server: `npm run dev`
+7. Set `SESSION_SECRET` to a private random value of at least 32 characters. For example, generate one with `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"`. Never commit `.env` or reuse the example value in production.
+8. Import the starter data and standard roles with `npm run db:import`. This replaces the starter collections and clears any confirmations in that database; it preserves existing users and adds the `customer` and `admin` roles.
+9. Run the automated tests with `npm test`. Tests use a temporary local database and do not change the database in your `.env` file.
+10. Start the development server: `npm run dev`
+
+### Provisional Week 04 core authentication
+
+The current Week 04 course assignment lists Core Authentication as Feature Set 1. This implementation follows that feature set, but the repository does not show a confirmed team owner for it. Public registration always assigns the `customer` role; the submitted form cannot select a role. To test the admin dashboard locally, create an account and change its `role` reference in the `users` collection to the existing `admin` document in `roles`. No default administrator or password is seeded.
+
+The app uses bcrypt password hashes and MongoDB-backed Express sessions. The browser cookie contains only a signed session identifier and is HttpOnly, SameSite=Lax, and Secure in production. The session secret is required at startup. EJS pages redirect unauthenticated visitors to `/login`; APIs return JSON 401 for unauthenticated requests and 403 for authenticated users without the required role.
+
+For a reproducible Loom demo that cannot touch a persistent MongoDB instance, run `npm run demo:auth`. It starts MongoDB Memory Server, seeds the standard roles and one randomly credentialed local admin, and uses an ephemeral session secret. The script prints the temporary admin password to its terminal; keep that terminal out of the recording and do not reuse the credential. Register a separate fictional customer through `/register`, then demonstrate both roles. Stop the process with Ctrl+C; the temporary database and secret are discarded. `NODE_ENV=test` is used only by this local demo so its HTTP cookie works without HTTPS.
+
+Routes added for this feature:
+
+- `GET/POST /register` and `GET/POST /login`
+- `POST /logout` (requires a login)
+- `GET /admin` (requires the `admin` role)
+- `GET /api/auth/me` (requires a login)
+- `GET /api/admin/dashboard` (requires the `admin` role)
+
+The implementation is a proposed Feature Set 1 contribution. The W03 bookings and schedules PRs are not included in this branch; their changes touch shared app, route, database, and dependency files and must be reconciled before integration.
+
+For an isolated admin demo, create a fictional user first, then in the local MongoDB database set that test user's `role` to the seeded admin role:
+
+```javascript
+const adminRole = db.roles.findOne({ name: 'admin' });
+db.users.updateOne(
+  { email: 'demo-customer@example.test' },
+  { $set: { role: adminRole._id } }
+);
+```
+
+Sign out and back in after changing the role because the role is copied into the session at login. Never promote an account this way in a shared or production database.
 
 The first test run may take longer because MongoDB Memory Server needs to download a MongoDB program. Later test runs reuse that download. Use `npm run test:watch` if you want Vitest to rerun related tests while you work.
 
