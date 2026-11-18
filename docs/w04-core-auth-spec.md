@@ -48,7 +48,7 @@ Authentication establishes `req.user`; authorization separately compares its ses
 
 Automated HTTP tests in `tests/auth.test.js` exercise invalid registration, successful registration and hashing, duplicate accounts, bad credentials, session persistence, page/API 401 and 403 behavior, admin access, logout revocation, and cookie flags. Existing `tests/trains.test.js` covers the trains API regression.
 
-Verified: `npm run lint` passed; `npm test -- --reporter=verbose` passed (2 files, 7 tests); the database import module ran against an isolated MongoDB Memory Server and confirmed both standard roles; and the app's local HTTP flow was exercised in a browser for registration, login, a customer 403 on `/admin`, authenticated `/api/auth/me`, logout, and a post-logout API 401. The admin-allowed case is covered by automated HTTP tests. Test evidence is not a substitute for team review or an official feature-owner confirmation. No Loom recording exists yet.
+Verified: `npm run lint` passed; `npm test -- --reporter=verbose` passed (2 files, 7 tests); the database import module ran against an isolated MongoDB Memory Server and confirmed both standard roles; and `npm run demo:auth` was exercised in a browser for customer registration/login, `/api/auth/me`, customer 403 responses, logout followed by 401, and successful temporary-admin access to the page and API. Test evidence is not a substitute for team review or an official feature-owner confirmation. No Loom recording exists yet.
 
 ## Integration boundary
 

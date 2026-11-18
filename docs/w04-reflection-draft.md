@@ -14,7 +14,7 @@ The official Week 04 assignment lists Feature Set 1, Core Authentication, and ma
 
 **3. GitHub Issue links:** [Proposed Core Authentication Issue #1](https://github.com/kennethduron/cse341-kizuna-rail-w04/issues/1).
 
-**4. Pull Request links:** Pending. The open W03 PRs overlap shared integration files; a team PR should wait until the accepted integration baseline is clear.
+**4. Pull Request links:** [Draft PR #6](https://github.com/Neron56/cse341-team-project/pull/6). It targets upstream `main`, is not merged, and is not team-approved.
 
 ## Implementation Reflection
 
@@ -28,7 +28,7 @@ I learned to regenerate the session identifier after successful login so a pre-l
 
 **7. What did you do to make your pull requests clear and ready for teammate review?**
 
-The implementation branch is isolated from `main`, and the spec lists routes, statuses, data, and acceptance tests. I ran the lint and full test suite and checked registration, login, access denial, and logout over local HTTP in a browser. I have not opened a team PR because the W03 PRs overlap the integration files; I will add the real walkthrough URL only after recording it and resolving that baseline. No team PR or review has happened yet.
+The branch is isolated from `main`, and the spec lists routes, statuses, data, and acceptance tests. Draft PR #6 links Issue #1, documents decisions and verified checks, and lists the W03 integration limitation. Lint and the full test suite passed; I also checked registration, login, customer denial, admin access, and logout over local HTTP in a browser using MongoDB Memory Server. The PR is still a draft, has not been reviewed, and has no video link yet.
 
 ## Team Process
 
@@ -38,6 +38,6 @@ I can identify the integration baseline and route/file ownership before starting
 
 ## Evidence status
 
-- Confirmed: current official W04 assignment and learning activity were retrieved; the fork Issue #1, feature branch, implementation, lint result, 7 passing tests, and local browser/HTTP flow exist.
-- Pending: Loom recording and link, team integration baseline, and a non-conflicting PR decision.
+- Confirmed: current official W04 assignment and learning activity were retrieved; fork Issue #1, Draft PR #6, feature branch, implementation, lint result, 7 passing tests, isolated role import, and local browser/HTTP flow exist. GitHub currently reports the PR mergeable against current `main`.
+- Pending: Loom recording/link, team feature-owner confirmation, W03 integration review, and teammate review. GitHub's mergeable status against `main` does not prove a conflict-free integration with the unmerged W03 PRs.
 - Not claimed: formal team assignment, team review, deployment, Loom URL, or any result that has not been observed.

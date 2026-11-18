@@ -11,6 +11,7 @@
 	},
 	"scripts": {
 		"db:import": "node --env-file=.env src/db/import.js",
+		"demo:auth": "node scripts/auth-demo.js",
 		"dev": "nodemon --env-file=.env server.js",
 		"reset": "node restore.js 3000 3001",
 		"start": "node --env-file=.env server.js",

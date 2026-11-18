@@ -71,6 +71,8 @@ The current Week 04 course assignment lists Core Authentication as Feature Set 1
 
 The app uses bcrypt password hashes and MongoDB-backed Express sessions. The browser cookie contains only a signed session identifier and is HttpOnly, SameSite=Lax, and Secure in production. The session secret is required at startup. EJS pages redirect unauthenticated visitors to `/login`; APIs return JSON 401 for unauthenticated requests and 403 for authenticated users without the required role.
 
+For a reproducible Loom demo that cannot touch a persistent MongoDB instance, run `npm run demo:auth`. It starts MongoDB Memory Server, seeds the standard roles and one randomly credentialed local admin, and uses an ephemeral session secret. The script prints the temporary admin password to its terminal; keep that terminal out of the recording and do not reuse the credential. Register a separate fictional customer through `/register`, then demonstrate both roles. Stop the process with Ctrl+C; the temporary database and secret are discarded. `NODE_ENV=test` is used only by this local demo so its HTTP cookie works without HTTPS.
+
 Routes added for this feature:
 
 - `GET/POST /register` and `GET/POST /login`
