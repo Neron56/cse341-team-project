@@ -40,6 +40,7 @@ app.use(globalMiddleware);
 app.use((req, res, next) => {
     res.locals.isLoggedIn = Boolean(req.session.user);
     res.locals.user = req.session.user || null;
+    res.locals.isAdmin = req.session.user?.role === 'admin';
     next();
 });
 

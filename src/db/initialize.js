@@ -11,8 +11,20 @@ const starterCollections = [
   ['stations', stations],
   ['ticketClasses', ticketClasses],
   ['trains', trains],
-  ['roles', roles],
 ];
+
+const seedRoles = async (db) => {
+  const collection = db.collection('roles');
+  await collection.bulkWrite(
+    roles.map(({ name }) => ({
+      updateOne: {
+        filter: { name },
+        update: { $setOnInsert: { name } },
+        upsert: true,
+      },
+    }))
+  );
+};
 
 const initializeDatabase = async (db) => {
   if (!db) {
@@ -24,6 +36,8 @@ const initializeDatabase = async (db) => {
     await collection.deleteMany({});
     await collection.insertMany(documents);
   }
+
+  await seedRoles(db);
 
   const confirmations = db.collection('confirmations');
   await confirmations.deleteMany({});

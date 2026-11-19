@@ -5,29 +5,30 @@ const userSchema = new mongoose.Schema(
     {
         displayName:{
             type:String,
-            unique:true,
         },
         username:{
             type:String,
-            require:true,
+            required:true,
             unique:true,
         },
         email:{
             type:String,
-            require:true,
+            required:true,
             unique:true,
             lowercase:true,
         },
         passwordHash:{
             type:String,
-            require:true,
+            required:true,
         },
         role:{
-            type:mongoose.Schema.Types.ObjectId,
+            type: mongoose.Schema.Types.ObjectId,
             ref: 'Role',
-            require:true,
+            required: true,
         },
     }
 );
 
-export const user = mongoose.model('user', userSchema);
+const user = mongoose.model('user', userSchema);
+
+export default user;

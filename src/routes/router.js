@@ -3,6 +3,9 @@ import { trainsApi, trainsPage } from './trains.js';
 import { Router } from 'express';
 import { homePage, aboutPage, testErrorPage } from './index.js';
 import { loginPage, registerPage } from './users.js';
+import { processLoginForm, processLogout, processUserRegistrationForm, } from '../controllers/users.js';
+import { adminPage } from './admin.js';
+import { requirePageRole } from '../middleware/auth.js';
 
 const router = Router();
 
@@ -25,7 +28,13 @@ router.use('/trips', railTripsRouter);
 router.get('/500', testErrorPage);
 
 router.get('/login', loginPage);
+router.post('/login', processLoginForm);
 
 router.get('/register', registerPage);
+router.post('/register', processUserRegistrationForm)
+
+router.get('/adminDashboard', requirePageRole('admin'), adminPage)
+
+router.get('/logout', processLogout);
 
 export default router;

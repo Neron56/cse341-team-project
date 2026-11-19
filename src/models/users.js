@@ -1,19 +1,26 @@
 //src/models/users.js. 
 import user from "./schemas/users.js";
+import role from "./schemas/roles.js";
+import bcrypt from "bcrypt";
 
-export async function createUser(name, email, password) {
-    const customer = await Role.findOne({ name: 'user' });
-    if (!customer) throw new Error('Default role not found');
+export async function createUser(displayName, username, email, password) {
+    const defaultRole = await role.findOne({ name: 'user' });
+    if (!defaultRole) throw new Error('Default role not found');
+    if(!password) throw new Error('Password is required');
+    if (!displayName){
+        displayName = username;
+    }
 
     const passwordHash = await bcrypt.hash(password, 12);
-    const user = await User.create({
-        name,
+    const createdUser = await user.create({
+        displayName,
+        username,
         email,
         passwordHash,
-        role: customer.name
+        role: defaultRole._id
     });
 
-    return user._id.toString();
+    return createdUser._id.toString();
 }
 
 export async function findUserByEmail(email) {
@@ -23,3 +30,24 @@ export async function findUserByEmail(email) {
 export async function verifyPassword(password, passwordHash) {   
     return bcrypt.compare(password, passwordHash);
 }
+
+export async function authenticateUser(email, password) {
+    const user = await findUserByEmail(email);
+    if (!user) return null;
+    if(user){
+        const verify = await verifyPassword(password, user.passwordHash);
+        if(verify){
+            delete user.passwordHash;
+            return {
+                _id: user._id,
+                displayName: user.displayName,
+                role: user.role.name,
+
+            }
+        }else{
+            return null;
+        };
+    }else{
+        return null;
+    };
+};
