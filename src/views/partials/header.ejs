@@ -38,6 +38,15 @@
                     <li><a href="/trips">Trips</a></li>
                     <li><a href="/trains">Trains</a></li>
                     <li><a href="/about">About</a></li>
+                    <% if (isLoggedIn) { %>
+                        <% if (isAdmin){ %>
+                            <li><a href="/adminDashboard">Admin Dashboard</a></li>
+                        <% } %>
+                        <li><a href="/logout">Logout</a></li>
+                        <% } else { %>
+                            <li><a href="/login">login</a></li>
+                            <li><a href="/register">register</a></li>
+                    <% } %>
                     <li><a href="/404">404</a></li>
                     <li><a href="/500">500</a></li>
                 </ul>
