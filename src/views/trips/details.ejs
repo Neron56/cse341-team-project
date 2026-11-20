@@ -51,10 +51,14 @@
                 <div class="station">
                     <span class="station-label">Start</span>
                     <span class="station-name"><%= details.startStation.charAt(0).toUpperCase() + details.startStation.slice(1) %></span>
+                    <button type="button" data-station-id="<%= details.startStation %>" aria-expanded="false" aria-controls="start-station-details">Start station details</button>
+                    <div id="start-station-details" role="region" aria-label="Start station details" aria-live="polite" hidden></div>
                 </div>
                 <div class="station">
                     <span class="station-label">End</span>
                     <span class="station-name"><%= details.endStation.charAt(0).toUpperCase() + details.endStation.slice(1) %></span>
+                    <button type="button" data-station-id="<%= details.endStation %>" aria-expanded="false" aria-controls="end-station-details">End station details</button>
+                    <div id="end-station-details" role="region" aria-label="End station details" aria-live="polite" hidden></div>
                 </div>
             </div>
         </div>
@@ -99,4 +103,5 @@
     </div>
 </article>
 
+<script src="/js/stations.js" defer></script>
 <%- include('../partials/footer') %>
