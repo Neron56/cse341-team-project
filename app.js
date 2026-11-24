@@ -1,7 +1,10 @@
+
 import express from 'express';
 import Path from 'path';
 import { fileURLToPath } from 'url';
 import pkg from './package.json' with { type: 'json' };
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
 import globalMiddleware from './src/middleware/global.js';
 import routes from './src/routes/router.js';
 
@@ -9,6 +12,26 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = Path.dirname(__filename);
 
 const app = express();
+
+// Swagger configuration
+const swaggerOptions = {
+    definition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'Kizuna Rail API',
+            version: '1.0.0',
+            description: 'API documentation for Kizuna Rail train trips',
+        },
+        servers: [
+            {
+                url: 'http://localhost:3000',
+            },
+        ],
+    },
+    apis: [Path.join(__dirname, 'src/routes/api-routes.js')],
+};
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
 // Add version info to res.locals for access in templates.
 app.use((req, res, next) => {
@@ -26,6 +49,10 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 app.use(globalMiddleware);
+
+// Swagger documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 app.use('/', routes);
 
 // Catch requests that did not match a route.
