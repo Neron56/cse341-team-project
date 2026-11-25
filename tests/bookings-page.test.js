@@ -129,4 +129,86 @@ describe('bookings admin client rendering', () => {
     expect(fetch.mock.calls[2][0]).toBe('/api/bookings?page=1&limit=10&sort=desc');
     dom.window.close();
   });
+
+  test('applies filters on submit, keeps them across pages, and clears back to page one', async () => {
+    const fetch = vi.fn();
+    for (const [page, total] of [[1, 25], [2, 25], [3, 25], [1, 12], [2, 12], [1, 12], [1, 25]]) {
+      fetch.mockResolvedValueOnce(ok(result([], page, total)));
+    }
+    const dom = await renderPage(fetch);
+    const document = dom.window.document;
+    const form = document.getElementById('bookings-filters');
+    const label = document.getElementById('bookings-page');
+    document.getElementById('bookings-next').click();
+    await vi.waitFor(() => expect(label.textContent).toBe('Page 2 of 3'));
+    form.elements.ticketClass.value = 'premium';
+    document.getElementById('bookings-next').click();
+    await vi.waitFor(() => expect(label.textContent).toBe('Page 3 of 3'));
+    expect(fetch.mock.calls[2][0]).not.toContain('ticketClass');
+    form.dispatchEvent(new dom.window.Event('submit', { bubbles: true, cancelable: true }));
+    await vi.waitFor(() => expect(label.textContent).toBe('Page 1 of 2'));
+    expect(fetch.mock.calls[3][0]).toContain('page=1&limit=10&sort=desc&ticketClass=premium');
+    document.getElementById('bookings-next').click();
+    await vi.waitFor(() => expect(label.textContent).toBe('Page 2 of 2'));
+    expect(fetch.mock.calls[4][0]).toContain('page=2&limit=10&sort=desc&ticketClass=premium');
+    form.elements.ticketClass.value = 'first';
+    document.getElementById('bookings-previous').click();
+    await vi.waitFor(() => expect(label.textContent).toBe('Page 1 of 2'));
+    expect(fetch.mock.calls[5][0]).toContain('ticketClass=premium');
+    document.getElementById('bookings-clear').click();
+    await vi.waitFor(() => expect(label.textContent).toBe('Page 1 of 3'));
+    expect(form.elements.ticketClass.value).toBe('');
+    expect(fetch.mock.calls[6][0]).toBe('/api/bookings?page=1&limit=10&sort=desc');
+    expect(dom.window.location.pathname).toBe('/bookings-admin');
+    dom.window.close();
+  });
+
+  test('sends both date bounds and displays a no-matches state', async () => {
+    const fetch = vi.fn().mockResolvedValueOnce(ok(result([], 1, 25))).mockResolvedValueOnce(ok(result()));
+    const dom = await renderPage(fetch);
+    const document = dom.window.document;
+    const form = document.getElementById('bookings-filters');
+    form.elements.startDate.value = '2026-11-20';
+    form.elements.endDate.value = '2026-11-21';
+    form.dispatchEvent(new dom.window.Event('submit', { bubbles: true, cancelable: true }));
+    await vi.waitFor(() => expect(document.getElementById('bookings-empty').hidden).toBe(false));
+    expect(document.getElementById('bookings-empty').textContent).toContain('match these filters');
+    expect(fetch.mock.calls[1][0]).toContain('startDate=2026-11-20&endDate=2026-11-21');
+    dom.window.close();
+  });
+
+  test('rejects a reversed date range locally without changing the current results', async () => {
+    const fetch = vi.fn(async () => ok(result([], 1, 25)));
+    const dom = await renderPage(fetch);
+    const document = dom.window.document;
+    const form = document.getElementById('bookings-filters');
+    form.elements.startDate.value = '2026-11-21';
+    form.elements.endDate.value = '2026-11-20';
+    form.dispatchEvent(new dom.window.Event('submit', { bubbles: true, cancelable: true }));
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(document.getElementById('bookings-error').textContent).toContain('Start date must not be after end date');
+    expect(document.getElementById('bookings-page').textContent).toBe('Page 1 of 3');
+    dom.window.close();
+  });
+
+  test('ignores a late response from an older filter request', async () => {
+    let resolveOld;
+    const oldRequest = new Promise((resolve) => { resolveOld = resolve; });
+    const fetch = vi.fn().mockResolvedValueOnce(ok(result([], 1, 25)))
+      .mockReturnValueOnce(oldRequest).mockResolvedValueOnce(ok(result([], 1, 3)));
+    const dom = await renderPage(fetch);
+    const document = dom.window.document;
+    const form = document.getElementById('bookings-filters');
+    form.elements.ticketClass.value = 'premium';
+    form.dispatchEvent(new dom.window.Event('submit', { bubbles: true, cancelable: true }));
+    form.elements.ticketClass.value = 'first';
+    form.dispatchEvent(new dom.window.Event('submit', { bubbles: true, cancelable: true }));
+    await vi.waitFor(() => expect(document.getElementById('bookings-page').textContent).toBe('Page 1 of 1'));
+    resolveOld(ok(result([], 1, 12)));
+    await oldRequest;
+    await new Promise((resolve) => dom.window.setTimeout(resolve, 0));
+    expect(document.getElementById('bookings-page').textContent).toBe('Page 1 of 1');
+    expect(document.getElementById('bookings-error').hidden).toBe(true);
+    dom.window.close();
+  });
 });

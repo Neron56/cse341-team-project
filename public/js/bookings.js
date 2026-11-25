@@ -9,6 +9,9 @@ const loadBookings = async () => {
   const pageLabel = document.getElementById('bookings-page');
   const summary = document.getElementById('bookings-summary');
   const retry = document.getElementById('bookings-retry');
+  const filterForm = document.getElementById('bookings-filters');
+  let appliedFilters = {};
+  let lastRequestedFilters = {};
   let page = 1;
   let lastRequestedPage = 1;
   let pagination;
@@ -19,17 +22,28 @@ const loadBookings = async () => {
     next.disabled = busy || !pagination?.hasNextPage;
   };
 
-  const fetchPage = async (requestedPage) => {
+  const fetchPage = async (requestedPage, filters = appliedFilters) => {
+    const requestedFilters = { ...filters };
     const currentRequest = ++requestNumber;
     lastRequestedPage = requestedPage;
+    lastRequestedFilters = requestedFilters;
     loading.hidden = false;
     errorMessage.hidden = true;
     retry.hidden = true;
     updateControls(true);
     try {
       const query = new URLSearchParams({ page: requestedPage, limit: 10, sort: 'desc' });
+      for (const [key, value] of Object.entries(requestedFilters)) {
+        if (value) query.set(key, value);
+      }
       const response = await fetch(`/api/bookings?${query}`);
       if (!response.ok) {
+        if (response.status === 400) {
+          const payload = await response.json();
+          const failure = new Error(payload.error || 'Invalid booking filters.');
+          failure.isQueryError = true;
+          throw failure;
+        }
         throw new Error(`Failed to load bookings (${response.status})`);
       }
       const { bookings, pagination: metadata } = await response.json();
@@ -40,7 +54,7 @@ const loadBookings = async () => {
       }
       // A concurrent deletion may have removed the last page since it was shown.
       if (requestedPage > 1 && requestedPage > metadata.totalPages) {
-        await fetchPage(Math.max(1, metadata.totalPages));
+        await fetchPage(Math.max(1, metadata.totalPages), requestedFilters);
         return;
       }
 
@@ -68,15 +82,17 @@ const loadBookings = async () => {
 
       list.replaceChildren(fragment);
       pagination = metadata;
+      appliedFilters = requestedFilters;
       page = metadata.page;
       empty.hidden = metadata.totalItems > 0;
+      empty.textContent = Object.keys(appliedFilters).length ? 'No bookings match these filters.' : 'No bookings yet.';
       pageLabel.textContent = metadata.totalPages ? `Page ${page} of ${metadata.totalPages}` : 'No pages';
       const start = metadata.totalItems ? (page - 1) * metadata.limit + 1 : 0;
       const end = start ? start + bookings.length - 1 : 0;
       summary.textContent = `Showing ${start}-${end} of ${metadata.totalItems} bookings`;
     } catch (error) {
       if (currentRequest !== requestNumber) return;
-      errorMessage.textContent = 'Unable to load bookings. Please try again.';
+      errorMessage.textContent = error.isQueryError ? error.message : 'Unable to load bookings. Please try again.';
       errorMessage.hidden = false;
       retry.hidden = false;
     } finally {
@@ -89,7 +105,25 @@ const loadBookings = async () => {
 
   previous.addEventListener('click', async () => { await fetchPage(page - 1); });
   next.addEventListener('click', async () => { await fetchPage(page + 1); });
-  retry.addEventListener('click', async () => { await fetchPage(lastRequestedPage); });
+  retry.addEventListener('click', async () => { await fetchPage(lastRequestedPage, lastRequestedFilters); });
+  filterForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const filters = Object.fromEntries([...new FormData(filterForm)].filter(([, value]) => value));
+    if (filters.startDate && filters.endDate && filters.startDate > filters.endDate) {
+      ++requestNumber;
+      loading.hidden = true;
+      retry.hidden = true;
+      errorMessage.textContent = 'Start date must not be after end date.';
+      errorMessage.hidden = false;
+      updateControls();
+      return;
+    }
+    await fetchPage(1, filters);
+  });
+  document.getElementById('bookings-clear').addEventListener('click', async () => {
+    filterForm.reset();
+    await fetchPage(1, {});
+  });
   await fetchPage(1);
 };
 

@@ -20,7 +20,7 @@ export async function getAllBookings(req, res) {
         hasNextPage: options.page < totalPages
       },
       sort: { by: 'createdAt', order: options.sort },
-      filters: {}
+      filters: options.filters
     });
   } catch (error) {
     if (error instanceof BookingQueryError) {

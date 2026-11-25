@@ -29,7 +29,7 @@ describe('paginated bookings API', () => {
     );
     expect(response.body.pagination).toEqual({ page: 1, limit: 10, totalItems: 25, totalPages: 3, hasPreviousPage: false, hasNextPage: true });
     expect(response.body.sort).toEqual({ by: 'createdAt', order: 'desc' });
-    expect(response.body.filters).toEqual({});
+    expect(response.body.filters).toEqual({ ticketClass: null, startDate: null, endDate: null });
     expect(response.headers['cache-control']).toBe('no-store');
   });
 
