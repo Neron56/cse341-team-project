@@ -66,7 +66,7 @@ This repository is set up as a **GitHub template**. Use the template feature to 
 
 The first test run may take longer because MongoDB Memory Server needs to download a MongoDB program. Later test runs reuse that download. Use `npm run test:watch` if you want Vitest to rerun related tests while you work.
 
-### Week 05: booking pagination
+### Week 05: booking pagination and filters
 
 Open `/bookings` (or the compatible `/bookings-admin` alias) for an API-driven
 list with Previous/Next controls and 10 bookings per page. `/api/bookings`
@@ -74,8 +74,15 @@ accepts `page`, `limit`, and `sort=asc|desc`, with newest bookings first by defa
 Responses include `bookings`, `pagination`, `sort`, and `filters` metadata.
 See [the W05 spec](docs/w05-bookings-spec.md) for validation and response details.
 
+Optional filters are `ticketClass=standard|premium|first`, `startDate=YYYY-MM-DD`,
+and `endDate=YYYY-MM-DD`. Dates apply to booking creation, include each full
+UTC calendar day, and may be used together or alone. The API combines them with
+AND and reports totals for matching records only. Apply/Clear filters reset
+the page to 1; Previous/Next preserve the applied filters. Reversed ranges,
+impossible dates, repeated parameters, and unknown classes return JSON 400.
+
 Before using existing data, stop the app and run `npm run db:migrate-bookings`.
-This also normalizes valid old timestamp strings and adds the date-order index;
+This also normalizes valid old timestamp strings and adds date-order and class/date indexes;
 invalid historical date values are preserved for manual correction.
 For a disposable recording/demo, use `npm run demo:bookings` and open
 `http://127.0.0.1:3400/bookings`. The demo has 36 fictional bookings from

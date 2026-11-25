@@ -80,6 +80,24 @@ router.get('/trains', trainsApi);
  *           enum: [asc, desc]
  *           default: desc
  *         description: Sort createdAt and _id in the same direction for stable ties
+ *       - in: query
+ *         name: ticketClass
+ *         schema:
+ *           type: string
+ *           enum: [standard, premium, first]
+ *         description: Match one ticket class; combine with date bounds using AND
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Inclusive booking createdAt date, YYYY-MM-DD at midnight UTC
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Inclusive booking createdAt date, YYYY-MM-DD through the full UTC day; must not precede startDate
  *     responses:
  *       '200':
  *         description: Bookings returned successfully (array may be empty)
@@ -127,7 +145,20 @@ router.get('/trains', trainsApi);
  *                 filters:
  *                   type: object
  *                   additionalProperties: false
- *                   description: No filters applied in the pagination-only endpoint
+ *                   required: [ticketClass, startDate, endDate]
+ *                   description: Normalized filters; omitted parameters are null and all pagination totals describe matching bookings only
+ *                   properties:
+ *                     ticketClass:
+ *                       type: string
+ *                       nullable: true
+ *                     startDate:
+ *                       type: string
+ *                       format: date
+ *                       nullable: true
+ *                     endDate:
+ *                       type: string
+ *                       format: date
+ *                       nullable: true
  *       '400':
  *         description: Invalid, repeated, structured, or unknown query parameter
  *         content:

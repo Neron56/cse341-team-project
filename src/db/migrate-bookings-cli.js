@@ -7,6 +7,7 @@ try {
   await normalizeBookingDates(db);
   await db.collection('bookings').createIndex({ id: 1 }, { unique: true });
   await db.collection('bookings').createIndex({ createdAt: -1, _id: -1 });
+  await db.collection('bookings').createIndex({ ticketClass: 1, createdAt: -1, _id: -1 });
   console.log(renamed ? 'Renamed confirmations to bookings.' : 'No legacy collection to rename.');
 } finally {
   await closeDb();

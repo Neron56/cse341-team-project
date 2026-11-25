@@ -8,6 +8,25 @@
         gap: var(--space-md);
     }
 
+    .booking-filters {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: end;
+        gap: var(--space-md);
+        margin-block: var(--space-lg);
+    }
+
+    .booking-filters label {
+        display: grid;
+        gap: var(--space-sm);
+    }
+
+    select, input {
+        padding: var(--space-sm);
+        min-width: 0;
+        max-width: 100%;
+    }
+
     button {
         padding: var(--space-sm) var(--space-md);
     }
