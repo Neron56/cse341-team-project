@@ -9,7 +9,7 @@ const router = Router();
 router.get('/', homePage);
 router.get('/about', aboutPage);
 router.get('/trains', trainsPage);
-router.get('/bookings-admin', bookingsAdminPage);
+router.get(['/bookings', '/bookings-admin'], bookingsAdminPage);
 router.use('/trips', railTripsRouter);
 router.get('/500', testErrorPage);
 

@@ -4,7 +4,7 @@ import app from '../app.js';
 import Booking from '../src/models/schemas/bookings.js';
 import { createBooking, getBookingById } from '../src/models/bookings.js';
 import { getDb } from '../src/db/connect.js';
-import { migrateBookings } from '../src/db/migrate-bookings.js';
+import { migrateBookings, normalizeBookingDates } from '../src/db/migrate-bookings.js';
 
 const passenger = {
   firstName: 'Aki', lastName: 'Tanaka', email: 'aki@example.com', phone: '+81 90 1234 5678'
@@ -108,7 +108,7 @@ describe('bookings API and admin page', () => {
     const response = await request(app).get('/api/bookings');
     expect(response.status).toBe(200);
     expect(response.headers['content-type']).toContain('application/json');
-    expect(response.body).toEqual({ bookings: [] });
+    expect(response.body).toMatchObject({ bookings: [], pagination: { totalItems: 0, totalPages: 0 } });
   });
 
   test('returns stored bookings and passenger details', async () => {
@@ -140,6 +140,19 @@ describe('bookings API and admin page', () => {
 });
 
 describe('legacy collection migration', () => {
+  test('normalizes valid legacy timestamp strings without removing records', async () => {
+    const db = getDb();
+    await db.collection('bookings').insertMany([
+      { id: 'JRSTRING', createdAt: '2026-11-25T10:30:00.000Z', updatedAt: '2026-11-25T11:30:00.000Z' },
+      { id: 'JRINVALID', createdAt: 'not-a-date' }
+    ]);
+    await normalizeBookingDates(db);
+    const record = await db.collection('bookings').findOne({ id: 'JRSTRING' });
+    expect(record.createdAt).toEqual(new Date('2026-11-25T10:30:00Z'));
+    expect(record.updatedAt).toEqual(new Date('2026-11-25T11:30:00Z'));
+    expect(await db.collection('bookings').countDocuments()).toBe(2);
+    expect((await db.collection('bookings').findOne({ id: 'JRINVALID' })).createdAt).toBe('not-a-date');
+  });
   test('renames existing documents and is safe to rerun', async () => {
     const db = getDb();
     await db.collection('bookings').drop();
