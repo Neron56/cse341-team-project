@@ -1,6 +1,17 @@
 .bookings-admin {
     padding-block: var(--space-lg);
 
+    .bookings-pagination {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-md);
+    }
+
+    button {
+        padding: var(--space-sm) var(--space-md);
+    }
+
     #bookings-list {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));

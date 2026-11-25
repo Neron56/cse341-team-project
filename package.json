@@ -7,6 +7,7 @@
 		"mongoose": "^9.12.1"
 	},
 	"scripts": {
+		"demo:bookings": "node scripts/bookings-demo.js",
 		"db:migrate-bookings": "node --env-file=.env src/db/migrate-bookings-cli.js",
 		"db:import": "node --env-file=.env src/db/import.js",
 		"dev": "nodemon --env-file=.env server.js",

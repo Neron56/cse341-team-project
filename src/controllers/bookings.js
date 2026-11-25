@@ -1,21 +1,38 @@
 import {
   createBooking,
-  getAllBookings as findAllBookings,
+  getBookingsPage,
   getBookingById
 } from '../models/bookings.js';
 import { getBookingOptions } from '../models/booking-options.js';
+import { BookingQueryError, parseBookingQuery } from '../includes/booking-query.js';
 
 export async function getAllBookings(req, res) {
+  res.set('Cache-Control', 'no-store');
   try {
-    const bookings = await findAllBookings();
-    return res.status(200).json({ bookings });
+    const options = parseBookingQuery(req.query);
+    const { bookings, totalItems } = await getBookingsPage(options);
+    const totalPages = Math.ceil(totalItems / options.limit);
+    return res.status(200).json({
+      bookings,
+      pagination: {
+        page: options.page, limit: options.limit, totalItems, totalPages,
+        hasPreviousPage: totalItems > 0 && options.page > 1,
+        hasNextPage: options.page < totalPages
+      },
+      sort: { by: 'createdAt', order: options.sort },
+      filters: {}
+    });
   } catch (error) {
+    if (error instanceof BookingQueryError) {
+      return res.status(400).json({ error: error.message });
+    }
     console.error('Error fetching bookings:', error);
     return res.status(500).json({ error: 'Failed to fetch bookings' });
   }
 }
 
 export function bookingsAdminPage(req, res) {
+  res.set('Cache-Control', 'no-store');
   return res.render('bookings', { title: 'Bookings Admin' });
 }
 

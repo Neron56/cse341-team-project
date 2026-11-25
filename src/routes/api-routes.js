@@ -56,8 +56,30 @@ router.get('/trains', trainsApi);
  *           format: date-time
  * /api/bookings:
  *   get:
- *     summary: Return all bookings, newest first
+ *     summary: Return a page of bookings sorted by booking date
  *     tags: [Bookings]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *         description: Positive safe integer; out-of-range pages return an empty array
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 10
+ *       - in: query
+ *         name: sort
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: desc
+ *         description: Sort createdAt and _id in the same direction for stable ties
  *     responses:
  *       '200':
  *         description: Bookings returned successfully (array may be empty)
@@ -65,12 +87,57 @@ router.get('/trains', trainsApi);
  *           application/json:
  *             schema:
  *               type: object
- *               required: [bookings]
+ *               required: [bookings, pagination, sort, filters]
  *               properties:
  *                 bookings:
  *                   type: array
  *                   items:
  *                     $ref: '#/components/schemas/Booking'
+ *                 pagination:
+ *                   type: object
+ *                   required: [page, limit, totalItems, totalPages, hasPreviousPage, hasNextPage]
+ *                   properties:
+ *                     page:
+ *                       type: integer
+ *                       minimum: 1
+ *                     limit:
+ *                       type: integer
+ *                       minimum: 1
+ *                       maximum: 100
+ *                     totalItems:
+ *                       type: integer
+ *                       minimum: 0
+ *                     totalPages:
+ *                       type: integer
+ *                       minimum: 0
+ *                     hasPreviousPage:
+ *                       type: boolean
+ *                     hasNextPage:
+ *                       type: boolean
+ *                 sort:
+ *                   type: object
+ *                   required: [by, order]
+ *                   properties:
+ *                     by:
+ *                       type: string
+ *                       enum: [createdAt]
+ *                     order:
+ *                       type: string
+ *                       enum: [asc, desc]
+ *                 filters:
+ *                   type: object
+ *                   additionalProperties: false
+ *                   description: No filters applied in the pagination-only endpoint
+ *       '400':
+ *         description: Invalid, repeated, structured, or unknown query parameter
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               required: [error]
+ *               properties:
+ *                 error:
+ *                   type: string
  *       '500':
  *         description: Failed to fetch bookings
  *         content:

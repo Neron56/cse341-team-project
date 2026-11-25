@@ -26,6 +26,7 @@ const initializeDatabase = async (db) => {
   const bookings = db.collection('bookings');
   await bookings.deleteMany({});
   await bookings.createIndex({ id: 1 }, { unique: true });
+  await bookings.createIndex({ createdAt: -1, _id: -1 });
 };
 
 export { initializeDatabase, starterCollections };

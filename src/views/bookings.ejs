@@ -2,10 +2,17 @@
 
 <section class="bookings-admin">
     <h1>Bookings Admin</h1>
-    <p>Review bookings and passenger details.</p>
+    <p>Review bookings and passenger details, 10 at a time. Newest bookings first; dates shown in UTC.</p>
     <p id="bookings-loading" role="status">Loading bookings...</p>
     <p id="bookings-error" role="alert" hidden></p>
     <p id="bookings-empty" hidden>No bookings yet.</p>
+    <button type="button" id="bookings-retry" hidden>Retry</button>
+    <p id="bookings-summary" role="status"></p>
+    <nav class="bookings-pagination" aria-label="Booking pages">
+        <button type="button" id="bookings-previous" disabled>Previous</button>
+        <span id="bookings-page">No pages</span>
+        <button type="button" id="bookings-next" disabled>Next</button>
+    </nav>
     <div id="bookings-list" aria-live="polite"></div>
 
     <template id="booking-card-template">
