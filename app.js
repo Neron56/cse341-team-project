@@ -5,8 +5,15 @@ import { fileURLToPath } from 'url';
 import pkg from './package.json' with { type: 'json' };
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
+import session from 'express-session';
 import globalMiddleware from './src/middleware/global.js';
 import routes from './src/routes/router.js';
+
+const SESSION_SECRET = process.env.SESSION_SECRET;
+
+if (!SESSION_SECRET) {
+    throw new Error('SESSION_SECRET is required in the .env file');
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = Path.dirname(__filename);
@@ -47,6 +54,26 @@ app.set('views', Path.join(__dirname, 'src/views'));
 // Parse JSON and URL-encoded request bodies.
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Configure user sessions.
+app.use(session({
+    secret: SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        maxAge: 60 * 60 * 1000,
+        httpOnly: true,
+        sameSite: 'lax'
+    }
+}));
+
+// Make login information available in EJS templates.
+app.use((req, res, next) => {
+    res.locals.isLoggedIn = Boolean(req.session.user);
+    res.locals.user = req.session.user || null;
+    res.locals.isAdmin = req.session.user?.role === 'admin';
+    next();
+});
 
 app.use(globalMiddleware);
 
