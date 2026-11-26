@@ -38,8 +38,7 @@ router.post('/register', processUserRegistrationForm)
 
 router.get('/adminDashboard', requirePageRole('admin'), adminPage)
 
-// router.get('/users', requirePageRole('admin'), usersPage)
-router.get('/users', usersPage)
+router.get('/users', requirePageRole('admin'), usersPage)
 
 router.get('/logout', processLogout);
 

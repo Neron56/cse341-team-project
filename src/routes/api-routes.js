@@ -53,6 +53,6 @@ const router = Router();
  *       500:
  *         description: Unable to retrieve users
  */
-router.get('/users', createUsersList)
+router.get('/users', requireApiRole('admin'), createUsersList)
 
 export default router;
