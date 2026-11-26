@@ -39,7 +39,7 @@ Routes
 
 /register (GET shows the form, POST submits it)
 /login (GET shows the form, POST submits it)
-/logout (POST is safer than GET, since a GET link can be triggered accidentally or by another site)
+/logout (GET redirects to login)
 /adminDashboard protected with requirePageRole('admin')
 
 Views

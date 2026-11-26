@@ -1,0 +1,90 @@
+<%- include('../partials/header') %>
+    <section>
+        <div><h1>Welcome to the Users Dashboard</h1></div>
+
+        <div id='message'></div>
+
+        <table class='usersTable'>
+            <thead>
+                <tr>
+                    <th>Display Name</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                </tr>
+            </thead>
+            <tbody id='usersBody'></tbody>
+        </table>
+
+        <nav class="pagination" aria-label="User Pages">
+            <button type="button" id="previousPage">Previous</button>
+            <span id="pageInfo"></span>
+            <button type="button" id="nextPage">Next</button>
+        </nav>
+    </section>
+
+    <script>
+        const body = document.getElementById('usersBody');
+        const message = document.getElementById('message');
+        const pageInfo = document.getElementById('pageInfo');
+        const previousButton = document.getElementById('previousPage');
+        const nextButton = document.getElementById('nextPage');
+
+        const limit = 10;
+        let currentPage = 1;
+
+        function createCell(text) {
+            const cell = document.createElement('td');
+            cell.textContent = text;
+            return cell;
+        };
+
+        function renderUsers(users) {
+            const rows = users.map((user) => {
+                const row = document.createElement('tr');
+                row.append(
+                    createCell(user.displayName ?? ''),
+                    createCell(user.username),
+                    createCell(user.email),
+                    createCell(user.role?.name ?? '')
+                );
+                return row;
+            });
+            body.replaceChildren(...rows);
+        };
+
+        async function loadUsers(page = 1) {
+            message.textContent = 'Loading Users...';
+
+            try {
+                const response = await fetch(`/api/users?page=${page}&limiy=${limit}`);
+
+                if (response.status === 401 || response.status === 403) {
+                    message.textContent = 'You do not have permission to view users.';
+                    return;
+                }
+                if (!response.ok) {
+                    message.textContent = 'Unable to load users. Please try again';
+                    return;
+                }
+
+                const { data, pagination} = await response.json();
+
+                currentPage = pagination.page;
+                renderUsers(data);
+                message.textContent = data.length === 0 ? 'No users found.' : '';
+                pageInfo.textContent = `Page ${pagination.page} of ${Math.max(pagination.totalPages, 1)}`;
+                previousButton.disabled = !pagination.hasPreviousPage;
+                nextButton.disabled = !pagination.hasNextPage;
+            } catch (error) {
+                console.error(error);
+                message.textContent = 'Unable to load users. Please try again.';
+            }
+        }
+
+        previousButton.addEventListener('click', () => loadUsers(currentPage - 1));
+        nextButton.addEventListener('click', () => loadUsers(currentPage + 1));
+
+        loadUsers(1);
+    </script>
+<%- include('../partials/footer') %>

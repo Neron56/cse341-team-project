@@ -51,3 +51,13 @@ export async function authenticateUser(email, password) {
         return null;
     };
 };
+export async function getPaginatedUsers({ filter = {} ,page, limit, sort, order }) {
+    const skip =(page - 1) * limit;
+    const sortOptions = { [sort]: order, _id: 1 };
+
+    const [users, totalUsers] = await Promise.all([
+        user.find(filter).select('-passwordHash').populate('role', 'name').sort(sortOptions).skip(skip).limit(limit).lean(),
+        user.countDocuments(filter)
+    ]);
+    return { users, totalUsers };
+};

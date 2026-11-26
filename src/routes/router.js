@@ -1,8 +1,9 @@
 import railTripsRouter from './trips.js';
 import { trainsApi, trainsPage } from './trains.js';
 import { Router } from 'express';
+import apiRouter from './api-routes.js';
 import { homePage, aboutPage, testErrorPage } from './index.js';
-import { loginPage, registerPage } from './users.js';
+import { loginPage, registerPage, usersPage } from './users.js';
 import { processLoginForm, processLogout, processUserRegistrationForm, } from '../controllers/users.js';
 import { adminPage } from './admin.js';
 import { requirePageRole } from '../middleware/auth.js';
@@ -11,6 +12,8 @@ const router = Router();
 
 // Home page
 router.get('/', homePage);
+
+router.use('/api', apiRouter);
 
 // About page
 router.get('/about', aboutPage);
@@ -34,6 +37,9 @@ router.get('/register', registerPage);
 router.post('/register', processUserRegistrationForm)
 
 router.get('/adminDashboard', requirePageRole('admin'), adminPage)
+
+// router.get('/users', requirePageRole('admin'), usersPage)
+router.get('/users', usersPage)
 
 router.get('/logout', processLogout);
 

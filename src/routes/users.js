@@ -4,5 +4,8 @@ const loginPage = (req, res) => {
 const registerPage = (req, res) => {
     res.render('register', { title: 'Kizuna Rail' });
 };
+const usersPage = (req, res) => {
+    res.render('users/list', { title: 'User View' });
+};
 
-export {loginPage, registerPage};
+export {loginPage, registerPage, usersPage};
