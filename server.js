@@ -1,17 +1,17 @@
 import app from './app.js';
-import { connectToDb } from './src/db/connect.js';
+import mongoose from 'mongoose';
 
 const NODE_ENV = process.env.NODE_ENV?.toLowerCase() || 'production';
 const PORT = process.env.PORT || 3000;
 
-// Connect to MongoDB before accepting requests.
-await connectToDb();
+await mongoose.connect(process.env.MONGODB_URI);
 
 // Start the live-reload WebSocket server in development mode.
 if (NODE_ENV.includes('dev')) {
     const ws = await import('ws');
 
     try {
+        await mongoose.connect(process.env.MONGODB_URI);
         const wsPort = parseInt(PORT) + 1;
         const wsServer = new ws.WebSocketServer({ port: wsPort });
 

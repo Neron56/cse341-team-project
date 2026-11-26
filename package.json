@@ -1,9 +1,13 @@
 {
 	"name": "kizuna-rail-byui-demo",
 	"dependencies": {
+		"bcrypt": "^6.0.0",
 		"ejs": "^6.0.1",
 		"express": "^5.1.0",
-		"mongodb": "^7.5.0"
+		"express-session": "^1.19.0",
+		"mongodb": "^7.5.0",
+		"mongoose": "^9.12.2",
+		"swagger-ui-express": "^5.0.1"
 	},
 	"scripts": {
 		"db:import": "node --env-file=.env src/db/import.js",
@@ -13,7 +17,8 @@
 		"test": "vitest run",
 		"test:watch": "vitest",
 		"lint": "eslint .",
-		"lint:fix": "eslint . --fix"
+		"lint:fix": "eslint . --fix",
+		"swagger": "node swagger.js"
 	},
 	"type": "module",
 	"version": "1.0.0",
@@ -22,6 +27,7 @@
 		"mongodb-memory-server": "^11.2.0",
 		"nodemon": "^3.1.10",
 		"supertest": "^7.2.2",
+		"swagger-jsdoc": "^6.3.0",
 		"vitest": "^4.1.10",
 		"ws": "^8.18.3"
 	}
